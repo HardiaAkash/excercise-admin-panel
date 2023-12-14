@@ -2,12 +2,13 @@ const mongoose = require("mongoose")
 
 const adminSchema = new mongoose.Schema({
     "email":{
-        type : String,
-        // required: [true, "Provide ID"]
+        type:String,
+        required:[true, "Please provide user email."],
+        unique :  true,
     },
     "password":{
         type : String,
-        // required: [true, "Provide passcode"],
+        required: [true, "Provide passcode"],
         
     },
 })
