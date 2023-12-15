@@ -3,10 +3,10 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 
 
-const DeleteUser = ({ deleteId, closeModal, refreshData }) => {
+const DeleteUser = ({ deleteId, closeModal, refreshdata }) => {
 
   const [isLoading, setLoading] = useState(false);
-
+  const token = JSON.parse(sessionStorage.getItem("sessionToken"))
   const handleClose = () => {
     closeModal();
   };
@@ -20,8 +20,8 @@ const DeleteUser = ({ deleteId, closeModal, refreshData }) => {
       method: "DELETE",
       url: `/api/auth/deleteUser/${deleteId}`,
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     };
 
@@ -33,7 +33,7 @@ const DeleteUser = ({ deleteId, closeModal, refreshData }) => {
           setLoading(false);
           toast.success("Deleted successfully !");
           handleClose();
-          refreshData();
+          refreshdata();
         } else {
           setLoading(false);
           toast.error("Failed. something went wrong!");

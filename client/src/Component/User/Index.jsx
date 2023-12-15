@@ -20,8 +20,8 @@ const User = () => {
   const [isRefresh, setRefresh] = useState(false);
   const [editData, setEditData] = useState([]);
   const visiblePageCount = 15
-
-// all data
+  const token = JSON.parse(sessionStorage.getItem("sessionToken"))
+  // all data
   useEffect(() => {
     getAllData(1);
   }, [isRefresh]);
@@ -30,11 +30,11 @@ const User = () => {
     setLoader(true)
     const options = {
       method: "GET",
-      url: `http://50.19.152.61:3000/api/auth/viewUser?page=${pageNo}&limit=${visiblePageCount}`,
+      url: `/api/auth/viewUser?page=${pageNo}&limit=${visiblePageCount}`,
       headers: {
-        Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlhdCI6MTcwMjYzNDI3OCwiZXhwIjoxNzAyNjM3ODc4fQ.EErVNaH_WrhgKOtoNaxLvjkU3DKKZQ6z_eDDLKWBtTU",
-        'Content-Type': 'multipart/form-data',
-    },
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     };
     axios
       .request(options)
@@ -55,7 +55,7 @@ const User = () => {
       });
   };
 
-  
+
   const closeModal = () => {
     setIsOpen(false)
   }
@@ -63,7 +63,7 @@ const User = () => {
 
 
   const handleDelete = (id) => {
-    setUpdateId(1)
+    setUpdateId(id)
     setOpenDelete(true)
   }
 
@@ -80,7 +80,7 @@ const User = () => {
   return (
     <>
       {
-        isLoader && <Loader /   >
+        isLoader && <Loader />
       }
       <section>
         <div className="container mx-auto">
