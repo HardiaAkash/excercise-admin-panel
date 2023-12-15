@@ -29,6 +29,28 @@ const StatusMessage = {
 };
 var ObjectId = require('mongodb').ObjectId
 
+exports.verifyUser = async (req, res) => {
+  // console.log(req.params);
+  const { token } = req.params;
+  // console.log(token);
+  try {
+    if (!verifyToken(token)) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        error: StatusMessage.UNAUTHORIZED_ACCESS // Include the redirect path in the response
+      });
+    }else{
+      return res.status
+    }
+    // If verification succeeds, proceed with other actions or return success
+    // For example:
+    // return res.status(HttpStatus.OK).json({ message: 'Verification successful' });
+  } catch (error) {
+    console.log(error);
+    return res.status(HttpStatus.SERVER_ERROR).json({
+      error: StatusMessage.SERVER_ERROR
+    });
+  }
+};
 exports.addAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -337,10 +359,11 @@ exports.uploadImage = async (req, res, next) => {
 exports.addCategory = async (req, res) => {
   try {
 
-    const { category, file , video} = req.body;
+    const { category, file, video } = req.body;
+    
     const authHeader = req.headers.authorization;
 
-    if (!category && !file && Array.isArray(video) && video.length > 0) {
+    if (!category || !file  ||(!Array.isArray(video) || video.length == 0)) {
       return res.status(HttpStatus.BAD_REQUEST).json("Missing some data.");
     }
 
@@ -356,7 +379,7 @@ exports.addCategory = async (req, res) => {
     }
 
     // Creating the category
-    const categoryData = new Category({ category, file , video});
+    const categoryData = new Category({ category, file, video });
     const result = await categoryData.save();
 
     // If a file exists in the request, upload it to the S3 bucket
@@ -372,8 +395,11 @@ exports.addCategory = async (req, res) => {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.category === 1) {
       return res.status(HttpStatus.BAD_REQUEST).json(StatusMessage.DUPLICATE_DATA);
     }
-    if (error.code === 11000 && error.keyPattern && error.keyPattern.file === 1) {
+    else if (error.code === 11000 && error.keyPattern && error.keyPattern.file === 1) {
       return res.status(HttpStatus.BAD_REQUEST).json(StatusMessage.DUPLICATE_DATA);
+    }
+    else{
+      return res.status(HttpStatus.BAD_REQUEST).json(error);
     }
     // Handle errors
   }
@@ -441,7 +467,7 @@ exports.updateCategory = async (req, res) => {
 
 
 
-    const updatedCategory = await Category.findByIdAndUpdate(id,  updatedDetails , { new: true });
+    const updatedCategory = await Category.findByIdAndUpdate(id, updatedDetails, { new: true });
 
     if (!updatedCategory) {
       return res.status(HttpStatus.BAD_REQUEST).json("Category not found.");
@@ -454,6 +480,37 @@ exports.updateCategory = async (req, res) => {
     return res.status(HttpStatus.BAD_REQUEST).json("Error updating category.");
   }
 };
+exports.getCategoryById = async (req, res) => {
+  try {
+    const _id  = req.params.id;
+    let token = "";
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(HttpStatus.UNAUTHORIZED).json(StatusMessage.UNAUTHORIZED_ACCESS);
+    }
+
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.slice(7);
+    } else {
+      token = authHeader;
+    }
+
+    if (!verifyToken(token)) {
+      return res.status(HttpStatus.UNAUTHORIZED).json(StatusMessage.UNAUTHORIZED_ACCESS);
+    }
+
+    const categoryData = await Category.findById(_id);
+    if (!categoryData) {
+      return res.status(HttpStatus.BAD_REQUEST).json("Category not found.");
+    }
+
+    return res.status(HttpStatus.OK).json(categoryData);
+  } catch (error) {
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(StatusMessage.SERVER_ERROR);
+  }
+};
+
 
 exports.viewCategory = async (req, res) => {
   try {
@@ -476,9 +533,7 @@ exports.viewCategory = async (req, res) => {
       return res.status(HttpStatus.BAD_REQUEST).json(StatusMessage.MISSING_PAGE_PARAMS);
     }
     const startIndex = (page - 1) * limit
-    const query = search ?
-      { category: { $regex: search, $options: 'i' } }
-      : {};
+    const query = search ? { category: { $regex: `.*${search}.*`, $options: 'i' } } : {};
     const category = await Category.find(query).skip(startIndex).limit(limit);
     const totalCategory = await Category.countDocuments(query);
     const pagination = {
@@ -493,9 +548,25 @@ exports.viewCategory = async (req, res) => {
     return res.status(HttpStatus.BAD_REQUEST).json("Error fetching category.");
   }
 }
-/////////////////////////exercise/////////////////////
+/////////////////////////forgotpassword/////////////////////
 
-
+exports.forgotPwd = async (req, res) => {
+  const { contact, email } = req.body;
+  if (!(email || contact)) {
+    return res.status(HttpStatus.BAD_REQUEST).json(StatusMessage.INVALID_EMAIL_PASSWORD);
+  }
+  let user;
+  if (email) {
+    user = await User.findOne({ email });
+  } else {
+    user = await User.findOne({ contact });
+  }
+  if (!user) {
+    return res.status(HttpStatus.UNAUTHORIZED).json(StatusMessage.USER_NOT_FOUND);
+  }
+  const token = generateToken({ email: user.email });
+  
+}
 
 
 

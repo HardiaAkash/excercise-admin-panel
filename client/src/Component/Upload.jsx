@@ -25,7 +25,7 @@ export const Upload = () => {
 
     const formSubmit = async (e) => {
         e.preventDefault();
-            console.log(fileData)
+            // console.log(fileData)
         try {
             const response = await axios.post('api/auth/uploadImage', fileData, {
                 headers: {
@@ -34,7 +34,7 @@ export const Upload = () => {
                 },
             });
 
-            console.log('Category added:', response.data);
+            // console.log('Category added:', response.data);
         } catch (error) {
             console.error('Error adding category:', error.response.data);
         }
