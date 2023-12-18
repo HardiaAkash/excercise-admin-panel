@@ -3,7 +3,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import VideoPopup from "./VideoPopup";
 import axios from 'axios';
 import { toast } from 'react-toastify';
-const Editcategory = ({closeModal, editData ,refreshdata}) => {
+import CloseIcon from '../Svg/CloseIcon';
+const Editcategory = ({ closeModal, editData, refreshdata }) => {
     // console.log(editData);
     const [edit, setEdit] = useState(editData)
     const [imageDisable, setImageDisable] = useState(true)
@@ -14,8 +15,11 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
     const [videoview, setVideoview] = useState("")
     const [isLoading, setLoading] = useState(false);
     const token = JSON.parse(sessionStorage.getItem("sessionToken"))
-    console.log(edit);
+    // console.log(edit);
 
+    const hideModal = () => {
+        closeModal(false)
+    }
 
     useEffect(() => {
         checkImage()
@@ -54,15 +58,15 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
             setEdit({ ...edit, [e.target.name]: e.target.value })
         }
     }
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(edit);
+        // console.log(edit);
         const { _id, ...newEdit } = edit;
-        const updatedDetails =  newEdit
+        const updatedDetails = newEdit
         setLoading(true)
         try {
             const response = await axios.put('/api/auth/updateCategory', {
-                id:_id, updatedDetails
+                id: _id, updatedDetails
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -77,14 +81,14 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
                 closeModal()
                 refreshdata()
             } else {
-                console.log(response);
-               
+                // console.log(response);
+
                 toast.error(response)
                 setLoading(false)
             }
         } catch (error) {
             console.error('Error during category:', error);
-           
+
             toast.error("Something went wrong, try again later.")
             setLoading(false)
         }
@@ -104,7 +108,7 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
             });
 
             if (response.status === 200) {
-                console.log('Category added:', response?.data);
+                // console.log('Category added:', response?.data);
                 setEdit({ ...edit, ['file']: response?.data?.url })
                 setImageDisable(true)
             }
@@ -134,13 +138,13 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
             });
 
             if (response.status === 200) {
-                console.log('Video uploaded:', response?.data);
+                // console.log('Video uploaded:', response?.data);
                 const videoUrl = response?.data?.url;
-                       
+
                 setEdit({ ...edit, video: [...edit.video, videoUrl] });
                 setVideoDisable(true);
             } else {
-        
+
                 setVideoDisable(false);
             }
         } catch (error) {
@@ -151,7 +155,7 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
     return (
         <>
             <form action="" className="" onSubmit={handleSubmit}>
-                <div className="flex flex-col justify-center p-8  ">
+                <div className="flex flex-col justify-center px-4 py-4 md:px-8  ">
 
                     <div className="py-3 ">
                         <span className="login-input-label">Category</span>
@@ -166,36 +170,29 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
                             maxLength={64}
                             required />
                     </div>
-                    {
-                        edit?.file ?
-                            <div style={{ position: 'relative', width: '100px', height: '100px' }}>
-                                <img src={edit.file} alt="loading" style={{ width: '100px', height: '100px' }} />
-                                <button
-                                    onClick={handleRemoveImage}
-                                    className='text-[14px] px-4 font-[400] border rounded h-[25px] text-[red] hover:bg-[#efb3b38a]'
-                                    style={{
-                                        position: 'absolute',
-                                        top: '0px',
-                                        right: '0px',
-                                        // color:"red",
-                                        // width:"25px",
-                                        // height:"25px",
-                                        // borderRadius:"50%",
-                                        // background: 'black',
-                                        // padding:"2px",
-                                        // border: 'none',
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    X
-                                </button>
-                            </div>
-                            : ""
-                    }
-                    <div className="py-2 flex items-end gap-x-10">
+                    <div className="py-2 flex items-end gap-x-10 mt-2">
                         <div className="w-[50%]">
-                            <span className="login-input-label cursor-pointer mb-2">Image</span>
-                            <div className="flex items-center w-full">
+                            <span className="login-input-label cursor-pointer mb-3">Image :</span>
+                            {
+                                edit?.file ?
+                                    <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+                                        <img src={edit.file} alt="loading" style={{ width: '100px', height: '100px' }} />
+                                        <button
+                                            onClick={handleRemoveImage}
+                                            className='text-[14px] font-[400] text-[red] hover:bg-[#efb3b38a]'
+                                            style={{
+                                                position: 'absolute',
+                                                top: '0px',
+                                                right: '0px',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <CloseIcon />
+                                        </button>
+                                    </div>
+                                    : ""
+                            }
+                            <div className="flex items-center w-full pt-4 " >
 
                                 <input
                                     type="file"
@@ -215,30 +212,29 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
                             <button className="focus-visible:outline-none bg-[#070708bd] text-white text-[13px] px-4 py-1 rounded" type="button" onClick={uploadImage} disabled={imageDisable}>Upload</button>
                         </div>
                     </div>
-                    {
-                        Array.isArray(edit?.video) && edit?.video?.length > 0 ?
-                            edit.video.map((items, index) => {
-                                console.log(items);
-                                return (
-                                    <>
-                                        <div className='p-1 flex'>
-                                            <div className="text-[14px] font-[400]  cursor-pointer text-[blue]" onClick={() => handleVideo(items)}>{index + 1} Video</div>
-                                            <button className='text-[14px] px-4 font-[400] border rounded h-[25px] text-[red] hover:bg-[#efb3b38a] ml-4' onClick={() => removeVideo(index)}>Remove</button>
-                                        </div>
-                                    </>
-                                )
-                            })
-
-                            : ""
-                    }
-                    <div className="py-2 flex  items-end gap-x-10">
+                    <div className="py-2 flex  items-end gap-x-10 mt-2">
                         <div className="w-[50%]">
-                            <span className="login-input-label cursor-pointer mb-1">Video</span>
-                            <div className="flex items-center  w-full">
+                            <span className="login-input-label cursor-pointer mb-3">Video :</span>
+                            {
+                                Array.isArray(edit?.video) && edit?.video?.length > 0 ?
+                                    edit.video.map((items, index) => {
+                                        return (
+                                            <>
+                                                <div className='p-1 flex' key={index}>
+                                                    <div className="text-[14px] font-[400]  cursor-pointer text-[blue] whitespace-nowrap" onClick={() => handleVideo(items)}>{index + 1} Video</div>
+                                                    <button className='text-[14px] px-4 font-[400] border rounded h-[25px] text-[red] hover:bg-[#efb3b38a] ml-4' onClick={() => removeVideo(index)}>Remove</button>
+                                                </div>
+                                            </>
+                                        )
+                                    })
+
+                                    : ""
+                            }
+                            <div className="flex items-center  w-full pt-4">
                                 <input
                                     type="file"
                                     name="video"
-                                    className="w-full"
+                                    className="w-full "
                                     id="video"
                                     onChange={InputHandler}
                                     accept="video/mp4,video/x-m4v,video/*"
@@ -254,12 +250,19 @@ const Editcategory = ({closeModal, editData ,refreshdata}) => {
                             }
                         </div>
                     </div>
-                    <div className="mt-6">
+                    <div className="mt-4 flex pt-6 items-center justify-center md:justify-end  md:flex-nowrap gap-y-3 gap-x-3 ">
+                        <button
+                            type="button"
+                            className="rounded-[6px] py-1 px-4 max-w-[300px] w-full lg:w-[50%] border border-[gray] bg-white text-black"
+                        onClick={hideModal}
+                        >
+                            Cancel
+                        </button>
                         <button
                             type="submit"
-                            className="custom-button"
+                            className="custom-button rounded-[6px] py-1 px-4 max-w-[300px] w-full lg:w-[50%] border bg-[#1f2432] text-white"
                         >
-                            Add
+                            Update
                         </button>
                     </div>
 

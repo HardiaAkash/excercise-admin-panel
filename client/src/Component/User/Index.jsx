@@ -3,8 +3,6 @@ import axios from "axios";
 import { Dialog, Transition } from "@headlessui/react";
 import Pagination from "../Pagination/Index";
 import DeleteUser from "./DeleteUser";
-import EditUser from "./EditUser";
-import AddUser from "./AddUser";
 import Loader from "../WebsiiteLoader/Index";
 
 export const headItems = ["S. No.", "Name", " Contact No", "Email", "Action"]
@@ -82,7 +80,7 @@ const User = () => {
       {
         isLoader && <Loader />
       }
-      <section className="py-[40px] px-[20px]">
+      <section className="py-[40px] px-[20px] mt-[20px] lg:mt-0">
         <div className=" mx-auto">
           <div className="rounded-[10px] bg-white py-[15px] flex justify-between items-center px-[20px]">
             <p className=" text-[22px] font-semibold">User list</p>
@@ -100,7 +98,7 @@ const User = () => {
               </thead>
 
               <tbody>
-                {
+                {  Array.isArray(allData?.users) && 
                   allData?.users?.length > 0 &&
                   allData?.users?.map((items, index) => (
                     <tr key={index}>
@@ -120,6 +118,15 @@ const User = () => {
                 }
               </tbody>
             </table>
+
+
+            {
+            Array.isArray(allData?.users) && allData?.users?.length === 0  &&
+
+            <div className="py-4 px-4 w-full flex flex-col items-center justify-center border border-[#f3f3f3] bg-white rounded-[20px] mt-[10px]">
+              <p className="text-[18px] fontsemibold">No data</p>
+            </div>
+          }
           </div>
         </div>
 

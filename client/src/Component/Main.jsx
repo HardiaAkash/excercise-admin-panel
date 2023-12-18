@@ -1,17 +1,15 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { Fragment, useState } from "react";
+import {useNavigate } from "react-router-dom";
 
-import logo from "../assets/logo.svg"
 import Dashboard from "./Dashboard";
 import { useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import User from "./User/Index";
 import Category from "./Category/Category";
-import DashboardIcon from "./Svg/Dashboard";
+import DashboardIcon from "./Svg/DashboardIcon";
 import UserIcon from "./Svg/UserIcon";
 import CategoryIcon from "./Svg/CategoryIcon";
-import { SignoutIcon } from "./Svg/SignoutIcon";
 import LogoutIcon from "./Svg/Logout";
 
 export const menus = [
@@ -42,8 +40,13 @@ const SideMenu = () => {
     // console.log(token);
     const navigate = useNavigate()
     useEffect(() => {
-        verify()
-    }, [token])
+        if (token) {
+            verify()
+        }
+        else {
+            navigate("/")
+        }
+    }, [])
 
     const verify = async () => {
         try {
@@ -57,12 +60,13 @@ const SideMenu = () => {
         } catch (error) {
             console.error("Error occurred:", error);
             toast.error("Something went wrong.")
-              navigate("/");
+            navigate("/");
             // Handle the error, maybe navigate somewhere or show an error message
         }
     };
     const handleClick = (id) => {
         setComponentId(id)
+        setShowDrawer(false)
     }
     const handleSignout = () => {
         sessionStorage.removeItem("sessionToken")
@@ -73,7 +77,7 @@ const SideMenu = () => {
     return (
         <section className="">
             <div className="flex min-h-screen relative lg:static">
-                <div className="py-2 px-3  absolute top-3 flex flex-col gap-[5px] cursor-pointer lg:hidden"
+                <div className="py-2 px-3  absolute top-4 left-2 flex flex-col gap-[5px] cursor-pointer lg:hidden"
                     onClick={() => setShowDrawer(true)}>
                     <div className="bg-black h-[2px] w-[20px]"></div>
                     <div className="bg-black h-[2px] w-[20px]"></div>
@@ -82,7 +86,7 @@ const SideMenu = () => {
 
 
                 <div className={`w-[300px] bg-[#1f2432] text-white lg:py-[40px] lg:px-[40px] px-[10px] py-[10px] drawer
-                 ${showDrawer ? "block  absolute top-0 left-0 min-h-screen is-show" : "hidden lg:block" }`} >
+                 ${showDrawer ? "block  absolute top-0 left-0 min-h-screen is-show" : "hidden lg:block"}`} >
                     <div className="relative text-white  flex flex-col gap-[5px] cursor-pointer lg:hidden  text-right mr-3 mt-2"
                         onClick={() => setShowDrawer(false)}>
                         <div className="">X</div>
@@ -125,12 +129,12 @@ const SideMenu = () => {
                 <div className=" bg-[#f3f3f3] w-full  " >
 
                     {menus.map((item, index) => (
-                        <>
+                        <Fragment key={index}>
                             {
                                 ComponentId === item.id &&
                                 item.component
                             }
-                        </>
+                        </Fragment>
                     ))}
 
                 </div>

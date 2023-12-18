@@ -8,13 +8,14 @@ import Pagination from "../Pagination/Index";
 import VideoPopup from "./VideoPopup";
 import CloseIcon from "../Svg/CloseIcon";
 import ImagePopup from "./ImagePopup";
+import Loader from "../WebsiiteLoader/Index";
 
 export const headItems = ["S. No.", "Category name", " Profile picture", "Video", "Action"]
 
 
 const Category = () => {
   let [allData, setAllData] = useState([
-    
+
   ])
   const token = JSON.parse(sessionStorage.getItem("sessionToken"))
 
@@ -28,7 +29,7 @@ const Category = () => {
   const [video, setVideo] = useState("");
   let [openVideo, setOpenVideo] = useState(false)
   const [page, setPage] = useState(0)
-  const visiblePageCount = 2
+  const visiblePageCount = 10; //if we change from 10 then s.no will disturb
   const [viewImage, setViewImage] = useState("");
   let [openImage, setOpenImage] = useState(false)
   const [searchText, setSearchText] = useState("");
@@ -42,11 +43,11 @@ const Category = () => {
     setLoader(true)
     const options = {
       method: "GET",
-      url: `http://50.19.152.61:3000/api/auth/viewCategory?page=${pageNo}&limit=${visiblePageCount}`,
+      url: `/api/auth/viewCategory?page=${pageNo}&limit=${visiblePageCount}`,
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
-    },
+      },
     };
     axios
       .request(options)
@@ -145,45 +146,55 @@ const Category = () => {
     setViewImage(imgUrl)
   }
 
+
+  const handleSearchInput = (e) => {
+    setSearchText(e.target.value)
+    searchDataFunc(e.target.value)
+  }
+
   const handleSearch = () => {
     if (searchText) {
-      const options = {
-        method: "GET",
-        url: `/api/auth/viewCategory?search=${searchText}`,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      };
-      axios
-        .request(options)
-        .then((response) => {
-          console.log(response?.data);
-          if (response.status === 200) {
-            setAllData(response?.data);
-          }
-          else {
-            return
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+      searchDataFunc(searchText.trim())
     }
-  else{
-    return ;
-  }
   }
 
   const handleKeyDown = (e) => {
     console.log('Pressed key:', e.key);
-    if (e.key === "backspace") {
-      refreshdata()
+    if (e.key === "Backspace") {
+      // e.preventDefault(); // Prevent the default action
+      searchDataFunc(searchText)
     }
   }
+
   const handleClearSearch = () => {
     refreshdata()
     setSearchText("")
+  }
+
+  const searchDataFunc = (search_cate) => {
+
+    const options = {
+      method: "GET",
+      url: `/api/auth/viewCategory?search=${search_cate}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    axios
+      .request(options)
+      .then((response) => {
+        console.log(response?.data);
+        if (response.status === 200) {
+          setAllData(response?.data);
+        }
+        else {
+          return
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 
 
@@ -191,104 +202,113 @@ const Category = () => {
   return (
     <>
       {
-        isLoader && isLoader
+        isLoader && <Loader />
       }
       <section>
-        <div className="py-[40px] px-[20px] mx-auto">
-          <div className="rounded-[10px] bg-white py-[15px] flex justify-between items-center px-[20px]">
-            <p className=" text-[22px] font-semibold">Category</p>
-            <div className="flex gap-x-5 items-center">
-              <div className="border border-[gray] rounded-[5px] bg-[#302f2f82]] flex justify-center items-center h-[32px] pl-[10px]">
-                <input type="text " className=" focus-visible:outline-none border-none w-full rounded-[5px]  text-[15px]"
-                value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
+        <div className="py-[40px] px-[20px] mx-auto mt-[20px] lg:mt-0">
+          <div className="rounded-[10px] bg-white py-[15px] flex justify-center md:justify-between gap-x-20 items-center flex-wrap md:flex-auto gap-y-5 px-[20px]">
+            <p className=" text-[24px] font-semibold text-left ">Category</p>
+            <div className="flex gap-x-7 lg:gap-x-5 md:flex-auto flex-wrap gap-y-3  items-center justify-center md:justify-end">
+              <div className="border border-[gray] rounded-[5px] bg-[#302f2f82]] flex justify-center items-center h-[32px] pl-[10px] md:w-auto w-full">
+                <input type="text " className=" focus-visible:outline-none border-none w-full rounded-[5px] font-normal  text-[15px]"
+                  value={searchText}
+                  onChange={handleSearchInput}
                   onKeyDown={handleKeyDown}
                 />
-                {searchText !== "" ? 
-                   <button className="px-1 rounded text-[12px] text-[gray] border border-[#6a696917] hover:text-black mr-1"
-                   onClick={handleClearSearch}
-                   > X  </button>
-                    : "" }
-                <button className="px-6 rounded text-[12px] text-[gray]  h-[32px] bg-[#6a696917] hover:text-black"
-                onClick={handleSearch}
+                {searchText !== "" ?
+                  <button className="px-1 rounded text-[12px] text-[gray] border border-[#6a696917] hover:text-black mr-1"
+                    onClick={handleClearSearch}
+                  > X  </button>
+                  : ""}
+                <button className="px-6 rounded text-[12px] text-[gray] h-[32px] bg-[#6a696917] hover:text-black"
+                  onClick={handleSearch}
                 >Search  </button>
               </div>
-              <button className="custom-button" onClick={() => setIsOpen(true)}>Add new</button>
+              <button className="custom-button whitespace-nowrap md:w-auto w-full" onClick={() => setIsOpen(true)}>Add new</button>
             </div>
           </div>
-          <div className="rounded-[10px] bg-white py-[30px] px-[20px] flex justify-between items-center mt-[20px] p-6 overflow-x-scroll">
-            <table className="w-full min-w-[640px] table-auto mt-[20px] ">
-              <thead className="">
-                <tr className=" ">
-                  {headItems.map((items, inx) => (
-                    <th className="py-3 px-5 text-left bg-white" key={inx}>
-                      <p className="block text-[13px] font-medium uppercase text-[#72727b]"> {items}</p>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+          {Array.isArray(allData?.category) && allData?.category?.length > 0  &&
+            <div className="rounded-[10px] bg-white py-[30px] px-[20px] flex justify-between items-center mt-[20px] p-6 overflow-x-scroll">
+              <table className="w-full min-w-[640px] table-auto mt-[20px] ">
+                <thead className="">
+                  <tr className=" ">
+                    {headItems.map((items, inx) => (
+                      <th className="py-3 px-5 text-left bg-white" key={inx}>
+                        <p className="block text-[13px] font-medium uppercase text-[#72727b]"> {items}</p>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
 
-              <tbody>
-                {  Array.isArray(allData?.category)&&
-                  allData?.category?.length > 0 &&
+                <tbody>
+                  {
                   allData?.category?.map((items, index) => (
-                    <tr key={index}>
-                      {/* {console.log(allData?.pagination?.currentPage)} */}
-                      <td className="text-[14px] font-[400] py-3 px-5">{(index + 1) + (10*(allData?.pagination?.currentPage - 1))}</td>
-                      <td className="text-[14px] font-[400] py-3 px-5">{items?.category}</td>
-                      <td className="text-[14px] font-[400] py-3 px-5">
-                        <div className="cursor-pointer" onClick={() => handleImage(items?.file)}>
-                          <img src={items?.file} alt="fiteness" className="max-w-[100px]" />
-                        </div>
-                      </td>
-                      <td className="text-[14px] font-[400] py-3 px-5 cursor-pointer text-[blue]">
-                        {
-                          Array.isArray(items.video) && items.video?.length > 0 && 
-                          items.video.map((iter, inde)=>{
-                            return(
-                              <div className="" onClick={() => handleVideo(iter)}>{inde + 1} Video</div>
+                  <tr key={index}>
+                    {/* {console.log(allData?.pagination?.currentPage)} */}
+                    <td className="text-[14px] font-[400] py-3 px-5">{(index + 1) + (10 * (allData?.pagination?.currentPage - 1))}</td>
+                    <td className="text-[14px] font-[400] py-3 px-5 capitalize">{items?.category}</td>
+                    <td className="text-[14px] font-[400] py-3 px-5">
+                      <div className="cursor-pointer" onClick={() => handleImage(items?.file)}>
+                        <img src={items?.file} alt="fiteness" className="max-w-[100px] max-h-[100px]" />
+                      </div>
+                    </td>
+                    <td className="text-[14px] font-[400] py-3 px-5 cursor-pointer text-[blue]">
+                      {
+                        Array.isArray(items.video) && items.video?.length > 0 &&
+                        items.video.map((iter, inde) => {
+                          return (
+                            <div className="whitespace-nowrap" key={inde} 
+                            onClick={() => handleVideo(iter)}> {inde + 1} Video</div>
 
-                            )
-                          })
-                        }
-                      </td>
-                      <td className="text-[14px] font-[400] py-3 px-5">
-                        <div className="flex flex-col md:flex-row items-center gap-x-5">
-                          <button className="px-4 text-[13px] border rounded h-[25px] text-[gray] hover:bg-[#80808045] hover:text-[black]"
-                            onClick={() => handleEdit(items?._id)}
-                          >Edit</button>
-                          <button className="px-4 text-[13px] border rounded h-[25px] text-[red] hover:bg-[#efb3b38a]"
-                            onClick={() => handleDelete(items?._id)}
-                          >Delete</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                }
-              </tbody>
-            </table>
-          </div>
+                          )
+                        })
+                      }
+                    </td>
+                    <td className="text-[14px] font-[400] py-3 px-5">
+                      <div className="flex flex-col md:flex-row items-center gap-x-3 gap-y-3">
+                        <button className="px-4 text-[13px] border rounded h-[25px] text-[gray] hover:bg-[#80808045] hover:text-[black] md:w-auto w-full"
+                          onClick={() => handleEdit(items?._id)}
+                        >Edit</button>
+                        <button className="px-4 text-[13px] border rounded h-[25px] text-[red] hover:bg-[#efb3b38a] md:w-auto w-full"
+                          onClick={() => handleDelete(items?._id)}
+                        >Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          }
+
+          {
+            Array.isArray(allData?.category) && allData?.category?.length === 0  &&
+
+            <div className="py-4 px-4 w-full flex flex-col items-center justify-center border border-[#f3f3f3] bg-white rounded-[20px] mt-[10px]">
+              <p className="text-[18px] fontsemibold">No data</p>
+            </div>
+          }
         </div>
 
         {
-        allData?.pagination?.totalPages > 1 && (
-          <Pagination
-            currentpage={allData?.pagination?.currentPage}
-            totalCount={allData?.pagination?.totalPages}
-            visiblePageCount={visiblePageCount}
-            getAllData={getAllData}
-          />
-        )
+          allData?.pagination?.totalPages > 1 && (
+            <Pagination
+              currentpage={allData?.pagination?.currentPage}
+              totalCount={allData?.pagination?.totalPages}
+              visiblePageCount={visiblePageCount}
+              getAllData={getAllData}
+            />
+          )
         }
 
-     
+
 
       </section>
 
 
-  {/*---------- Video popup---------- */}
+      {/*---------- Video popup---------- */}
 
-  <Transition appear show={openVideo} as={Fragment}>
+      <Transition appear show={openVideo} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeVideoModal}>
           <Transition.Child
             as={Fragment}
@@ -314,7 +334,7 @@ const Category = () => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-[500px] transform overflow-hidden rounded-2xl bg-white py-10 px-12 text-left align-middle shadow-xl transition-all">
-                <div
+                  <div
                     className="xl:text-[20px] text-[18px] font-medium leading-6 text-gray-900 text-right absolute right-[15px] top-[15px] cursor-pointer"
                     onClick={closeVideoModal}
                   >
@@ -355,10 +375,10 @@ const Category = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-[600px] transform overflow-hidden rounded-2xl bg-white py-10 px-12 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-[600px] transform overflow-hidden rounded-2xl bg-white py-10 px-2 md:px-12 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="xl:text-[20px] text-[18px] font-medium leading-6 text-gray-900"
+                    className="xl:text-[20px] text-[18px] font-medium leading-6 text-gray-900 text-center md:text-left px-2"
                   >
                     Add new category
                   </Dialog.Title>
@@ -398,10 +418,10 @@ const Category = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-[600px] transform overflow-hidden rounded-2xl bg-white py-10 px-12 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-[600px] transform overflow-hidden rounded-2xl bg-white py-10 md:px-12 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="xl:text-[20px] text-[18px] font-medium leading-6 text-gray-900"
+                    className="xl:text-[20px] text-[18px] font-medium leading-6 text-gray-900 text-center md:text-left"
                   >
                     Edit Category
                   </Dialog.Title>
@@ -454,9 +474,9 @@ const Category = () => {
           </div>
         </Dialog>
       </Transition>
- {/*---------- Image popup---------- */}
+      {/*---------- Image popup---------- */}
 
- <Transition appear show={openImage} as={Fragment}>
+      <Transition appear show={openImage} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeImageModal}>
           <Transition.Child
             as={Fragment}
@@ -495,7 +515,7 @@ const Category = () => {
           </div>
         </Dialog>
       </Transition>
-    
+
     </>
   )
 };
