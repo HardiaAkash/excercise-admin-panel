@@ -194,7 +194,7 @@ const Category = () => {
         isLoader && isLoader
       }
       <section>
-        <div className="container mx-auto">
+        <div className="py-[40px] px-[20px] mx-auto">
           <div className="rounded-[10px] bg-white py-[15px] flex justify-between items-center px-[20px]">
             <p className=" text-[22px] font-semibold">Category</p>
             <div className="flex gap-x-5 items-center">

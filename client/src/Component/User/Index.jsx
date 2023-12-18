@@ -82,8 +82,8 @@ const User = () => {
       {
         isLoader && <Loader />
       }
-      <section>
-        <div className="container mx-auto">
+      <section className="py-[40px] px-[20px]">
+        <div className=" mx-auto">
           <div className="rounded-[10px] bg-white py-[15px] flex justify-between items-center px-[20px]">
             <p className=" text-[22px] font-semibold">User list</p>
           </div>

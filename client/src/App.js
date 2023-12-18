@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { Upload } from './Component/Upload';
-import Login from "./Component/login";
+import Login from "./Component/Login";
 import SideMenu from "./Component/Main";
 import Page1 from "./Component/Page1";
 import Page2 from "./Component/Page2";

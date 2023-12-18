@@ -2,7 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import bgImg from "../assets/bg-img.svg"
+// import bgImg from "../assets/bg-img.svg"
+import bgImg from "../assets/gym.jpg"
 import logo from "../assets/logo.svg"
 
 const Login = () => {
@@ -23,12 +24,12 @@ const Login = () => {
         setLoginDetails({ ...loginDetails, [e.target.name]: e.target.value })
     }
     useEffect(() => {
-      sessionStorage.removeItem("sessionToken")
+        sessionStorage.removeItem("sessionToken")
     }, [])
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // navigate("/")
+        // navigate("/admindashboard")
         setLoading(true)
         try {
             const response = await axios.post('/api/auth/adminlogin', loginDetails, {
@@ -41,7 +42,7 @@ const Login = () => {
                 // console.log('Login successful');
                 toast.success("Login successful!")
                 setLoading(false)
-                sessionStorage.setItem("sessionToken",JSON.stringify(response.data.token) )
+                sessionStorage.setItem("sessionToken", JSON.stringify(response.data.token))
                 // console.log(response.data.token);
                 navigate("/admindashboard")
             } else {
@@ -62,135 +63,84 @@ const Login = () => {
 
     return (
         <>
-            <div className="flex items-center justify-center min-h-screen bg-gray-100 login-bg ">
-                <div
-                    className="relative flex flex-col m-6 space-y-8   md:flex-row md:space-y-0 w-[80%]"
-                >
-                    <div className="shadow-2xl rounded-2xl w-[50%] bg-white">
-                        <form action="" className="" onSubmit={handleSubmit}>
-                            <div className="flex flex-col justify-center p-8 md:p-14 ">
-                                <div className="text-center">
-                                    <p className="mb-3 text-4xl font-bold">Welcome Admin</p>
-                                    <p className="font-light text-gray-400 mb-8">
-                                        Welcome back! Please enter your details
-                                    </p>
-                                </div>
-                                <div className="py-3 ">
-                                    <span className="login-input-label">Email</span>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        placeholder="Enter email"
-                                        className="login-input w-full mt-2 "
-                                        onChange={InputHandler}
-                                        pattern="[-a-zA-Z0-9~!$%^ *_=+}{'?]+(\.[-a-zA-Z0-9~!$%^ *_=+}{'?]+)*@([a-zA-Z0-9_][-a-zA-Z0-9_]*(\.[-a-zA-Z0-9_]+)*\.([cC][oO][mM]))(:[0-9]{1,5})?"
-                                        title="enter valid email ex. abc@gmail.com"
-                                        required />
-                                </div>
-                                <div className="py-2">
-                                    <span className="login-input-label">Password</span>
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        name="password"
-                                        placeholder="Enter password"
-                                        className="login-input w-full mt-2 "
-                                        onChange={InputHandler}
-                                        minLength={4}
-                                        required />
-                                    <div className="flex items-center mt-3 px-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            id="showPassword"
-                                            checked={showPassword}
-                                            onChange={() => setShowPassword(!showPassword)}
-                                            className="mr-2"
+            <div className="flex items-center justify-center lg:min-h-screen  ">
+                <div className="px-[50px]  mx-auto">
+                    <div
+                        className="relative flex flex-col 2xl:gap-x-20 xl:gap-x-10 gap-x-7 min-h-screen justify-center shadow-2xl lg:shadow-none  bg-[#f3f3f3]  items-center lg:flex-row space-y-8 md:space-y-0 w-[100%] px-[10px]  lg:bg-white lg:px-[40px] py-[20px] md:py-[40px] "
+                    >
+                        
+                        <div className="w-[100%] lg:w-[60%] xl:w-[50%]">
+                            <form action="" className="" onSubmit={handleSubmit}>
+                                <div className="flex flex-col gap-4 justify-center p-8 lg:p-14 md:max-w-[80%] lg:max-w-[100%] mx-auto ">
+                                    {/* <div className=" ">
+                                        <img
+                                            src={logo}
+                                            alt="img"
+                                            className="w-[250px] h-auto"
                                         />
-                                        <label htmlFor="showPassword" className="login-input-label">Show Password</label>
+                                    </div> */}
+                                    <div className="text-left ">
+                                        <p className="mb-2 2xl:text-[40px] md:text-[35px] text-[30px] leading-[38px] font-bold">Welcome Admin</p>
+                                        <p className="2xl:text-[18px] md:text-[16px] text-[15px] font-[400] leading-[26px] text-gray-400 mb-4 text-[#494949]">
+                                            Welcome back! Please enter your details
+                                        </p>
                                     </div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-theme-color font-medium text-white p-2 rounded-lg mb-6 hover:bg-white hover:text-black hover:border hover:border-gray-300"
-                                    >
-                                        Sign in
-                                    </button>
-                                </div>
-
-                            </div>
-                        </form>
-                    </div>
-                    {/* <div className="p-10    ">
-                        <img
-                            src={bgImg}
-                            alt="img"
-                        // class="w-[400px] h-full hidden rounded-r-2xl md:block object-cover"
-                        />
-
-                    </div> */}
-                </div>
-            </div>
-            {/* <ToastContainer/>    */}
-            {/* <section className="h-auto md:h-[100vh] flex flex-col items-center justify-center md:py-10 px-10 py-[100px]">
-            <div className="md:w-full lg:w-[80%] 2xl:w-[60%] bg-[white] shadow rounded-[3px]">
-                <div className="grid md:grid-cols-2">
-                    <div className="px-10 md:py-14  py-16 flex flex-col items-center justify-center lg:gap-12 md:gap-10 gap-12 bg-theme-color ">
-                        <div className="">
-                            <img src={logo} alt="fittness" />
-                        </div>
-                        <h1 className=" text-[26px] font-medium text-white text-center"> Login into Admin Dashboard</h1>
-                        <form action="" onSubmit={handleSubmit}>
-                            <div className=" flex flex-col items-center justify-center xl:gap-10 lg:gap-7 gap-5  lg:w-[350px] mx-auto">
-                                <div className="w-full  ">
-                                    <label htmlFor="email" className="login-input-label">Email</label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        placeholder="Enter email"
-                                        className="login-input w-full"
-                                        onChange={InputHandler}
-                                        pattern="[-a-zA-Z0-9~!$%^ *_=+}{'?]+(\.[-a-zA-Z0-9~!$%^ *_=+}{'?]+)*@([a-zA-Z0-9_][-a-zA-Z0-9_]*(\.[-a-zA-Z0-9_]+)*\.([cC][oO][mM]))(:[0-9]{1,5})?"
-                                        title="enter valid email ex. abc@gmail.com"
-                                        required />
-                                </div>
-                                <div className="">
-                                    <label htmlFor="password" className="login-input-label">password</label>
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        name="password"
-                                        placeholder="Enter password"
-                                        className="login-input w-full"
-                                        onChange={InputHandler}
-                                        minLength={8}
-                                        required />
-                                    <div className="flex items-center mt-3 px-2 cursor-pointer">
+                                    <div className="md:py-2">
+                                        {/* <span className="login-input-label">Email</span> */}
                                         <input
-                                            type="checkbox"
-                                            id="showPassword"
-                                            checked={showPassword}
-                                            onChange={() => setShowPassword(!showPassword)}
-                                            className="mr-2"
-                                            />
-                                        <label htmlFor="showPassword" className="login-input-label">Show Password</label>
+                                            type="email"
+                                            name="email"
+                                            placeholder="Email address"
+                                            className="login-input w-full mt-2 custom-input"
+                                            onChange={InputHandler}
+                                            pattern="[-a-zA-Z0-9~!$%^ *_=+}{'?]+(\.[-a-zA-Z0-9~!$%^ *_=+}{'?]+)*@([a-zA-Z0-9_][-a-zA-Z0-9_]*(\.[-a-zA-Z0-9_]+)*\.([cC][oO][mM]))(:[0-9]{1,5})?"
+                                            title="enter valid email ex. abc@gmail.com"
+                                            required />
                                     </div>
+                                    <div className="">
+                                        {/* <span className="login-input-label">Password</span> */}
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            name="password"
+                                            placeholder="Password"
+                                            className="login-input w-full mt-2 custom-input"
+                                            onChange={InputHandler}
+                                            minLength={4}
+                                            required />
+                                        <div className="flex items-center mt-4 px-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                id="showPassword"
+                                                checked={showPassword}
+                                                onChange={() => setShowPassword(!showPassword)}
+                                                className="mr-2"
+                                            />
+                                            <label htmlFor="showPassword" className="login-input-label">Show Password</label>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6">
+                                        <button
+                                            type="submit"
+                                            className="w-full bg-[#1f2432] font-medium text-white p-2 rounded-lg mb-6 hover:bg-white hover:border hover:border-gray-300 h-[50px] login-btn"
+                                        >
+                                            Sign In
+                                        </button>
+                                    </div>
+
                                 </div>
-                                <div className="w-full">
-                                    <button type="submit" className={`login-button ${isLoading ? "cursor-disable" : "cursor-pointer"}`}>
-                                        {isLoading ? "Loading..." : "Login"}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div className="px-10 py-10 md:flex flex-col items-center justify-center hidden text-center">
-                        <img src={bgImg} alt="bg-img" />
+                            </form>
+                        </div>
+                        <div className="block lg:w-[50%] px-[10px] lg:px-0">
+                            <img
+                                src={bgImg}
+                                alt="img"
+                                className="w-full h-auto mx-auto"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-        </section> */}
-
-
         </>
     )
 };
