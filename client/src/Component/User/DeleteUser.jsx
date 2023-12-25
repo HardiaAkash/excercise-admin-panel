@@ -65,6 +65,7 @@ const DeleteUser = ({ deleteId, closeModal, refreshdata }) => {
           </button>
         
             <button
+           
               className={`w-full px-4 text-[13px] border rounded py-2 text-red-700 focus-visible:outline-none
               ${isLoading ?  "text-[gray]" : "text-[red] hover:bg-[#efb3b38a]" }`}
               onClick={handleDelete}

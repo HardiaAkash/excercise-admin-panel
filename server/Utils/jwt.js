@@ -42,8 +42,13 @@ exports.isAuthJWT = async (req, res, next) => {
     if (!req.user) {
       req.user = await Admin.findOne({ email: decodedData?.email });
     }
+    if (req.user.activeToken  && req.user.activeToken === token) {
+      next();
+    } else {
+      return res.status(401).json({ message: 'Token expired, please login again' });
+    }
 
-    next();
+    
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ message: 'Token expired, please login again' });
